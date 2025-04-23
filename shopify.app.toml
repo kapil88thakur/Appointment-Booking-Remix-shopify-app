@@ -1,0 +1,36 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "8f80786663e6a686f2861d35322fa11b"
+name = "appointment-booking"
+handle = "appointment-booking-16"
+application_url = "https://hollow-seo-licensing-oak.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-04"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://hollow-seo-licensing-oak.trycloudflare.com/auth/callback",
+  "https://hollow-seo-licensing-oak.trycloudflare.com/auth/shopify/callback",
+  "https://hollow-seo-licensing-oak.trycloudflare.com/api/auth/callback"
+]
+
+[pos]
+embedded = false
