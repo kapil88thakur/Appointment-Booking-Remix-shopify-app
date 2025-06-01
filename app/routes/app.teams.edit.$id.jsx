@@ -22,132 +22,106 @@ import {
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
-import { useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData,useMatches } from "@remix-run/react";
 import DobCalendar from '../components/DobCalendar';
+import TeamForm from '../components/teamForm';
+//import { useFeatures } from '@shopify/polaris/build/ts/src/utilities/features';
 
 
 
 export async  function loader({ request,params }) {
 
-  //console.log("newshop sare",shop)
-    const users = await prisma.team.findUnique({
-      where: {
-        // shop: shop,
-        id:Number(params.id)
-      }
-    });
-    return { users };
+    const userID=Number(params.id);
+  
+    return {userID}
    }
    
    
-   export async function action({ request,params }) {
+  export async function action({ request,params }) {
     
-  //   const { admin } = await authenticate.admin(request);
+  const { session } = await authenticate.admin(request);
+    if (!session) return redirect('/auth/login'); // Important!
+    const { shop } = session;
+ 
+  if (request.method === "POST") {
+    const body = await request.json();
+    const userdata= body.user;
+    //userdata.shop=shop;
 
-  //   const shopInfoQuery = `
-  //   query shopInfo {
-  //     shop {
-  //       name
-  //       url
-  //       myshopifyDomain
-  //     }
-  //   }
-  // `;
-  
-  //  const response= await admin.graphql(shopInfoQuery);
-  // const respjson =await response.json();
-  // const shop= respjson.data.shop.myshopifyDomain;
-   const { session } = await authenticate.admin(request);
- const {shop}=session;
-
-
-
-
-
-    const formData = await request.formData();
-    const name = formData.get("name");
-   const phone=formData.get("phone");
-  // const  shop = formData.get("shop");
-   const gender=formData.get("gender");
-   const email=formData.get("email");
-   const address=formData.get("address");
-   const dob=formData.get("dob");
-
-
-    const data={
-      name: name,
-      gender: gender,
-      shop: shop,
-      phone  : phone,
-      email      : email,
-      address     : address,
-      dob     :dob
-    };
-     const upsertUser = await prisma.team.upsert({
+     const upsertUser = await prisma.team.update({
       where: {
         id: Number(params.id),
       },
-      update:      data   ,
-      create: data,
+      data:      userdata   ,
+     // create: userdata,
     })
    return {message:"form submitted successfully"};
-   }
+  }
+}
 
 
 export default function EditPage() {
+  const fetcher = useFetcher();    // "../"
+    useEffect(()=>{
+     fetcher.load("../../../app");
+    },[])
+  const { userID } = useLoaderData();
+  const matches = useMatches();
+  const parentMatch = matches.find((match) => match.id === 'routes/app');
+  const shopsession = parentMatch?.data?.shopsession;
+  const teams=parentMatch?.data?.shopsession.teams
+  const parentuser = teams.find((match) => match.id === userID);
+  console.log("edit page outlet useMatch are routes/app",parentuser);
+  const fetcherteams=fetcher.data?.shopsession.teams ;
+  const fetcheruser = fetcher.data?fetcherteams.find((match) => match.id === userID):null;
+  console.log("edit page fetcherteams are",fetcheruser);
+  const user= fetcheruser?fetcheruser:parentuser;
+  // const initialState = {
+  //   name: user.name,
+  //   shop:user.shop,
+  //   gender: user.gender,
+  //   phone: user.phone,
+  //   email: user.email,
+  //   dob:user.dob,
+  //   address:user.address,
+  // }
 
-  const { users } = useLoaderData();
-   const initialState = {
-     name: users.name,
-    // shop:shop,
-     gender: users.gender,
-     phone: users.phone,
-     email: users.email,
-     dob:users.dob,
-     address:users.address,
- }
-     const [inputs, setInputs] = useState(initialState);
-     const handleChange = (text,source)=>{
-       setInputs(prevState => ({...prevState, [source]: text}));
- }
- const options = [
-  {label: 'Male', value: 'male'},
-  {label: 'Female', value: 'female'}
-];
- 
+const [data,setData]=useState(null);
+async function handleButtonSubmit(){
+  await fetch(`/app/teams/edit/`+(user.id), {
+    method: 'POST',
+    body: JSON.stringify({ user: data }),
+    headers: {
+           "Content-Type": "multipart/form-data"
+    },
+  }).then(res=>{
+    if(res.status == 200){
+      shopify.toast.show('Team Edit successfully');
+    }else{
+      shopify.toast.show('Error Occurred. Please try again !', {isError: true });
+    }
+  }).catch(error => {
+    console.error('Error:',error);
+  });
+}
 
-   return (
-     <>
-      <Box>
-
-         <form method="post">
-           <FormLayout> 
-           {/* <TextField label="Shop name" name="shop" value={inputs.shop}  />
-            */}
-             <TextField label="Team name" name="name" value={inputs.name}   onChange={(e)=>handleChange(e,"name")} />
-             <FormLayout.Group>
-             <Select
-              label="Gender"
-              options={options}
-              onChange={(e)=>handleChange(e,"gender")}
-              value={inputs.gender}
-            />
-            <TextField   placeholder ="dob"  name="dob"  value={inputs.dob}  onChange={(e)=>handleChange(e,"dob")} />
-          
-            </FormLayout.Group>
-
-              <FormLayout.Group>
-               <TextField  placeholder ="phone"  name="phone"  value={inputs.phone}  onChange={(e)=>handleChange(e,"phone")}/>
-             <TextField   placeholder ="email"  name="email"  value={inputs.email}  onChange={(e)=>handleChange(e,"email")} />
-             </FormLayout.Group>
-            
-            
-                 <TextField   placeholder ="address"  name="address"  value={inputs.address} onChange={(e)=>handleChange(e,"address")} />
-              <Button submit>saves</Button> 
-             {/* <button type='submit' submit>Submit</button> */}
-           </FormLayout>     
-         </form>
-       </Box>
-     </>
+function handleChangevalue(newdata){
+  setData(newdata);
+}
+    console.log("userpassed is",user);
+    return (
+      <>
+        <Page    
+          backAction={{content: 'TeamPage', url:"/app/teams"}}
+          title="Create Team"
+          primaryAction={{content: 'Save',
+          onAction:handleButtonSubmit}}> 
+          <Layout>
+            <Layout.Section>
+              <TeamForm user={user} userID= {userID}   passData={handleChangevalue}  />
+            </Layout.Section>
+          </Layout>
+        </Page>
+      </>
    )
 }

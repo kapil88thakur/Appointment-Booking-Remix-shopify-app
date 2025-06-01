@@ -3,7 +3,7 @@
 client_id = "8f80786663e6a686f2861d35322fa11b"
 name = "appointment-booking"
 handle = "appointment-booking-16"
-application_url = "https://hollow-seo-licensing-oak.trycloudflare.com"
+application_url = "https://floyd-scored-german-sp.trycloudflare.com"
 embedded = true
 
 [build]
@@ -27,9 +27,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://hollow-seo-licensing-oak.trycloudflare.com/auth/callback",
-  "https://hollow-seo-licensing-oak.trycloudflare.com/auth/shopify/callback",
-  "https://hollow-seo-licensing-oak.trycloudflare.com/api/auth/callback"
+  "https://floyd-scored-german-sp.trycloudflare.com/auth/callback",
+  "https://floyd-scored-german-sp.trycloudflare.com/auth/shopify/callback",
+  "https://floyd-scored-german-sp.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:root@localhost:3306/appoint"
+}
+
+model Session {
+  id            String           @unique
+  shop         String
+  state        String
+  isOnline      Boolean  @default(false) 
+  scope        String
+  expires       DateTime?
+  accessToken  String
+  userId        Int?
+  firstName    String?
+  lastName     String?
+  email        String?
+  accountOwner  Boolean @default(false) 
+  locale        String?
+  collaborator  Boolean @default(false)
+  emailVerified Boolean @default(false)
+}
+
+    model Team {
+      id Int @id @default(autoincrement())
+      name String?
+      shop String
+      gender String?
+      phone String?
+      email String?
+      address String?
+      dob String?  
+    }
+
+    model TeamAvailability{
+      id Int @id @default(autoincrement())
+      tid String?
+      date String?
+      time String?
+    }
+
+    model Services{
+      id Int @id @default(autoincrement())
+      shop String 
+      pid String @unique
+      slotoptions String?
+    }
+
+    model TeamService{
+      id Int @id @default(autoincrement())
+      sid String?
+      tid String?
+    }
+
+    model OrderBooking{
+      id  Int @id @default(autoincrement())
+      orderId String?
+      date String?
+      time String?
+    }
+    
+    model CartBooking{
+      id  Int @id @default(autoincrement())
+      pid String?
+      date String?
+      time String?
+    }
+

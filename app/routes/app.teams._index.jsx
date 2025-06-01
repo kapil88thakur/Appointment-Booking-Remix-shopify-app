@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect,useState } from "react";
 import {
   Box,
   Card,
@@ -16,63 +16,44 @@ import {
   Avatar,
   ResourceItem,
 } from "@shopify/polaris";
-import { authenticate } from "../shopify.server";
+//import { authenticate } from "../shopify.server";
 import { TitleBar } from "@shopify/app-bridge-react";
-import prisma from "../db.server";
-import { useLoaderData } from "@remix-run/react";
+//import prisma from "../db.server";
+import { useFetcher,useLoaderData, useNavigate,useMatches } from "@remix-run/react";
 import TeamCard from "../components/teamCard";
 
 
-export async  function loader({ request }) {
-    const { session } = await authenticate.admin(request);
-  const { shop } = session;
-    const users = await prisma.team.findMany({
-      where: {
-        shop: shop
-      }
-    });
-    return { users };
-}
-
-
-// export async function action({ request }) {
-
-
-  // console.log("req made at app team create file",request)
-  // const { session } = await authenticate.admin(request);
-  // const { shop } = session;
-  
-  
-  //   const formData = await request.formData();
-  //   const name = formData.get("name");
-  // const phone=formData.get("phone");
-  // const gender=formData.get("gender");
-  // const email=formData.get("email");
-  // const address=formData.get("address");
-  // const dob=formData.get("dob");
-  //   const submit = await prisma.team.create({
-  //       data: { 
-  //           name: name,
-  //       gender: gender,
-  //       shop: shop,
-  //       phone  : phone,
-  //       email      : email,
-  //       address     : address,
-  //       dob     :dob
-  //         }
-  //   });
-  //   //const submit = await prisma.team.create({data:inputs});
-  //   return {
-  //       submit,
-  //   };
-
-  
- 
-// }
-
 export default function Index() {
-    const { users } = useLoaderData();
+    const fetcher = useFetcher();    // "../"
+    useEffect(()=>{
+    //  console.log("useeffect from team index page");
+     fetcher.load("../");
+      
+    },[])
+   // console.log("teamfetcher",fetcher);
+    const navigate =useNavigate();
+    const matches = useMatches();
+    console.log("usemath in team index page",matches);
+    const parentMatch = matches.find((match) => match.id === 'routes/app');
+    const shopsession = parentMatch?.data?.shopsession;
+    const userfromparent=parentMatch?.data?.shopsession.teams
+    const users=fetcher.data?.shopsession.teams || userfromparent;
+    console.log("ss fetcher data DATA",fetcher.data?.shopsession.teams);  //107208845
+     console.log("ss usemap routes/app data DATA",userfromparent);  //107208845
+    
+
   return (
-      <TeamCard  team={users}/>
+    <Page
+      title="Teams"
+      primaryAction={{content: 'Team Create',
+        //url: "/app/teams/create",
+        onAction:()=>navigate("/app/teams/create")
+        }}> 
+           <Layout>
+              <Layout.Section>
+                 <TeamCard  team={users}/>
+             </Layout.Section>
+           </Layout>
+      </Page>
   )
 }

@@ -16,7 +16,7 @@ import {
   InlineGrid
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
-
+import { useLoaderData,useSubmit,useFetcher} from "@remix-run/react";
 
 
 //  export async function action({ request }) {
@@ -55,12 +55,12 @@ import { TitleBar } from "@shopify/app-bridge-react";
 //   };
 //   // return null;
 //  }
-export default function ServiceCreate({shop,handleClick}) {
+export default function ServiceCreate() {
 
   const initialState = {
     name: '',
     gender: '',
-    shop:shop,
+   
     phone: '',
     email: '',
     dob:"",
@@ -73,30 +73,14 @@ export default function ServiceCreate({shop,handleClick}) {
       setInputs(prevState => ({...prevState, [source]: text}));
 }
 
- function handleSubmit (){
- //console.log("clicked")
 
-handleClick(inputs)
-  //  const submit =  prisma.team.create({
-  //     data: { 
-  //         name: "kapilth service",
-  //     gender: "gender",
-  //     shop: "shop",
-  //     phone  : "dd",
-  //     email      : "email",
-  //     address     : "address",
-  //     dob     :"dob"
-  //       }
-  // });
-
-}
-    //  console.log(inputs);
-
+    const fetcher = useFetcher();
 
   return (
     <>
      <Box>
-    <form method="post">
+     <fetcher.Form method="post">
+    
        {/* <Form> */}
           <FormLayout> 
             <TextField label="Team name" name="name" value={inputs.name}   onChange={(e)=>handleChange(e,"name")} />
@@ -105,10 +89,10 @@ handleClick(inputs)
             <TextField   placeholder ="email"  name="email"  value={inputs.email}  onChange={(e)=>handleChange(e,"email")} />
             <TextField  placeholder ="dob"  name="dob"  value={inputs.dob} onChange={(e)=>handleChange(e,"dob")} />
             <TextField   placeholder ="address"  name="address"  value={inputs.address} onChange={(e)=>handleChange(e,"address")} />
-            <Button submit onSubmit={handleSubmit}>saves</Button>
+            <Button submit  >Save</Button>
           </FormLayout>     
         {/* </Form> */}
-        </form>
+        </fetcher.Form>
       </Box>
        
     </>

@@ -6,14 +6,15 @@ export default function TeamCard({team}) {
    
 
 
-return(<Card>
+return(<Card className="KapilThakur">
 
 {team.map((user) =>  {
   let desc=user.email+" "+user.phone
-      return(<>
+      return(
      
-<MediaCard
+<MediaCard 
       title={user.name}
+      key={user.id}
       primaryAction={{
         content: 'Assign Service',
         onAction: () => {handleChange},
@@ -34,7 +35,7 @@ return(<Card>
       />
     </MediaCard>
 
-</>)
+)
     
 }  
     )

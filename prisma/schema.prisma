@@ -14,64 +14,59 @@ datasource db {
 }
 
 model Session {
-  id            String           @unique
-  shop         String
-  state        String
-  isOnline      Boolean  @default(false) 
-  scope        String
+  sid           Int       @id @default(autoincrement())
+  id            String    @unique
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
   expires       DateTime?
-  accessToken  String
-  userId        Int?
-  firstName    String?
-  lastName     String?
-  email        String?
-  accountOwner  Boolean @default(false) 
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
   locale        String?
-  collaborator  Boolean @default(false)
-  emailVerified Boolean @default(false)
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  services      Service[]
+  teams         Team[]
 }
 
-    model Team {
-      id Int @id @default(autoincrement())
-      name String?
-      shop String
-      gender String?
-      phone String?
-      email String?
-      address String?
-      dob String?  
-    }
+model Team {
+  id               Int                @id @default(autoincrement())
+  shop            Int
+  session          Session            @relation(fields: [shop], references: [sid], onDelete: Cascade)
+  name             String?
+  gender            String?
+  dob             String?  
+  phone            String?
+  email            String?
+  address          String?
+  bio              String?
+  image            String?
+  isActive         Boolean?          @default(false)
+  teamAvailability TeamAvailability[]
+  services         Service[]          @relation("ServicesOnTeam")
+ 
+}
 
-    model TeamAvailability{
-      id Int @id @default(autoincrement())
-      tid String?
-      date String?
-      time String?
-    }
+model TeamAvailability {
+  id     Int      @id @default(autoincrement())
+  teamId Int
+  team   Team?    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  date   DateTime
+  time   DateTime
+}
 
-    model Services{
-      id Int @id @default(autoincrement())
-      pid String?
-      slotoptions String?
-    }
+model Service {
+  id              Int               @id @default(autoincrement())
+  shop            Int
+  session         Session           @relation(fields: [shop], references: [sid], onDelete: Cascade)
+  productId       String            @unique
+  teams           Team[]            @relation("ServicesOnTeam")
+   
+}
 
-    model TeamService{
-      id Int @id @default(autoincrement())
-      sid String?
-      tid String?
-    }
-
-    model OrderBooking{
-      id  Int @id @default(autoincrement())
-      orderId String?
-      date String?
-      time String?
-    }
-    
-    model CartBooking{
-      id  Int @id @default(autoincrement())
-      pid String?
-      date String?
-      time String?
-    }
 
